@@ -1,7 +1,7 @@
 # coding:utf-8
 URL = ""
 # Bot
-TELEGRAM_KEYS = "850313928:AAHAfmlDrHzOvWw8G21oGSfAYh0xiwNyGpM"
+TELEGRAM_KEYS = ""
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
 
 # DataBase
