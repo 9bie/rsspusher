@@ -47,4 +47,5 @@ def tg_event():
         return "Show me your TOKEN please!"
     data = update.message.to_dict()
     handle(data, update)
+    return "ok"
 

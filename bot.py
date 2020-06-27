@@ -29,9 +29,11 @@ def handle(data,update):
             else:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="You are not in our list.")
+                return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
 
     elif command == "/add":
         try:
@@ -56,6 +58,7 @@ def handle(data,update):
                 else:
                     bot.send_message(chat_id=update.message.chat_id,
                             text="Sorry ,You are not Admin.")
+                    return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
@@ -75,9 +78,11 @@ def handle(data,update):
                 models.RssList.get(ID=int(data["text"].split(" ")[1])).delete_instance()
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="Success!.")
+                return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
     elif command == "/list":
         try:
             items = models.RssList.select()
@@ -89,6 +94,7 @@ def handle(data,update):
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
     elif command == "/help":
         bot.send_message(chat_id=update.message.chat_id,
                          text="User:\n"
@@ -104,6 +110,7 @@ def handle(data,update):
                               "\t/change_pwd change you password!\n"
                               "\t/update update now and do not push to follows\n"
                          )
+        return
     elif command == "/myself":
         try:
             if models.Follows.select().where(
@@ -117,9 +124,11 @@ def handle(data,update):
             else:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="You are not follows or not admin.")
+                return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
     elif command == "/privilege":
         try:
             if len(data["text"].split(" ")) != 2 and \
@@ -142,13 +151,16 @@ def handle(data,update):
                 ).execute()
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="Success!")
+                return
             else:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="User Not Found.")
+                return
 
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
     elif command == "/change_pwd":
         try:
             if models.Follows.select().where(
@@ -167,9 +179,11 @@ def handle(data,update):
                 ).execute()
             bot.send_message(chat_id=update.message.chat_id,
                                  text="Success! Your new password is {}".format(passwd))
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
     elif command == "/update":
         try:
             if models.Follows.select().where(
@@ -182,16 +196,20 @@ def handle(data,update):
             threading.Thread(target=rss.main, args=(True,)).start()
 
             bot.send_message(chat_id=update.message.chat_id, text="Success!")
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
     elif command == "/about":
         bot.send_message(chat_id=update.message.chat_id,
                          text="Made By 9bie's gongdi english and jiushi."
                               "\nWeb:{}\nGithub: https://github.com/9bie/rsspusher".format(URL))
+        return
     else:
         bot.send_message(chat_id=update.message.chat_id,
                          text="I don't know what you say,you can send /help for me.")
+        return
 
 
 def send_all_follows(msg):
