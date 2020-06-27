@@ -49,6 +49,7 @@ if __name__ == '__main__':
         IsAdmin=True,
         PassWD=passwd
     )
+
     print("Your web control account: \tusername:{}\n\tpassword is {}".format(YOUR_CHAT_ID_FOR_ADMIN,passwd))
     import rss
     rss.main(first_run=True)

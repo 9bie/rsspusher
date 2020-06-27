@@ -8,17 +8,17 @@ def handle(data,update):
     command = data["text"].split(" ")[0]
     if command == "/join":
         try:
-            if not models.Follows.select().where(
-                models.Follows.Telegram_id==update.message.chat_id,
-            ).exists:
+            try:
+                models.Follows.get(Telegram_id=update.message.chat_id)
+            except models.DoesNotExist:
                 models.Follows.create(
                     Telegram_id=update.message.chat_id,
                     IsAdmin=False
                 )
                 bot.send_message(chat_id=update.message.chat_id,
-                             text="Success")
-            else:
-                bot.send_message(chat_id=update.message.chat_id,
+                                 text="Success")
+                return
+            bot.send_message(chat_id=update.message.chat_id,
                                  text="You are followed.")
             return
         except Exception as e:
@@ -28,16 +28,16 @@ def handle(data,update):
 
     elif command == "/leave":
         try:
-            if models.Follows.select().where(
-                    models.Follows.Telegram_id==update.message.chat_id
-            ).exists:
-                models.Follows.get(Telegram_id=update.message.chat_id).delete_instance()
+            try:
+                models.Follows.get(Telegram_id=update.message.chat_id)
+            except models.DoesNotExist:
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success")
-            else:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not in our list.")
+                                 text="You are not followed..")
                 return
+            models.Follows.get(Telegram_id=update.message.chat_id).delete_instance()
+            bot.send_message(chat_id=update.message.chat_id,
+                                 text="Success")
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
@@ -50,43 +50,55 @@ def handle(data,update):
                          text="Param Error.")
                 return
             else:
-
-                if models.Follows.select().where(
-                    models.Follows.Telegram_id == update.message.chat_id,
-                    models.Follows.IsAdmin == True
-                ):
-                    title = data["text"].split(" ")[1]
-                    url = data["text"].split(" ")[2]
-                    models.RssList.create(
+                try:
+                    u = models.Follows.get(Telegram_id=update.message.chat_id)
+                    if u.IsAdmin is False:
+                        bot.send_message(chat_id=update.message.chat_id,
+                                         text="You are not admin!")
+                        return
+                except models.DoesNotExist:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="You are not followed!")
+                    return
+                title = data["text"].split(" ")[1]
+                url = data["text"].split(" ")[2]
+                models.RssList.create(
                         Title=title,
                         Rss=url
-                    )
-                    bot.send_message(chat_id=update.message.chat_id,
+                )
+                bot.send_message(chat_id=update.message.chat_id,
                                      text="Success!.")
-                else:
-                    bot.send_message(chat_id=update.message.chat_id,
-                            text="Sorry ,You are not Admin.")
-                    return
+                return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
     elif command == "/delete":
         try:
-            if len(data["text"].split(" ")) != 2 and\
-                    models.Follows.select().where(
-                        models.Follows.Telegram_id == update.message.chat_id,
-                        models.Follows.IsAdmin == True):
+            try:
+                u = models.Follows.get(Telegram_id=update.message.chat_id)
+                if u.IsAdmin is False:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="You are not admin!")
+            except models.DoesNotExist:
+                bot.send_message(chat_id=update.message.chat_id,
+                                 text="You are not followed!")
+                return
+
+            if len(data["text"].split(" ")) != 2 :
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="Param Error or you are not admin.")
                 return
 
-            if models.RssList.select(
-                models.RssList.ID == int(data["text"].split(" ")[1])
-                    ).exists:
-                models.RssList.get(ID=int(data["text"].split(" ")[1])).delete_instance()
+            try :
+                models.RssList.get(int(data["text"].split(" ")[1]))
+            except models.DoesNotExist:
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success!.")
+                                 text="rss not found..")
                 return
+            models.RssList.get(ID=int(data["text"].split(" ")[1])).delete_instance()
+            bot.send_message(chat_id=update.message.chat_id,
+                                 text="Success!.")
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
@@ -121,61 +133,74 @@ def handle(data,update):
         return
     elif command == "/myself":
         try:
-            if models.Follows.select().where(
-                models.Follows.Telegram_id == update.message.chat_id,
-                models.Follows.IsAdmin is True
-            ).exists:
+            try:
                 u = models.Follows.get(Telegram_id=update.message.chat_id)
+                if u.IsAdmin is False:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="You are not admin!")
+                    return
+            except models.DoesNotExist:
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="Your web control account:\n\tusername:{}\n\tpassword:{}".format(u.Telegram_id
-                                                                                                       , u.PassWD))
-            else:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not follows or not admin.")
+                                 text="You are not followed!")
                 return
+
+            u = models.Follows.get(Telegram_id=update.message.chat_id)
+            bot.send_message(chat_id=update.message.chat_id,
+                                 text="Your web control account:\n\tusername:{}\n\tpassword:{}".format(u.Telegram_id
+                                                                                              , u.PassWD))
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
             return
     elif command == "/privilege":
         try:
-            if len(data["text"].split(" ")) != 2 and \
-                    models.Follows.select().where(
-                        models.Follows.Telegram_id == update.message.chat_id,
-                        models.Follows.IsAdmin is True):
+            try:
+                u = models.Follows.get(Telegram_id=update.message.chat_id)
+                if u.IsAdmin is False:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="You are not admin!")
+                    return
+            except models.DoesNotExist:
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="Param Error or you are not admin.")
+                                 text="You are not followed!")
+                return
+            if len(data["text"].split(" ")) != 2 :
+                bot.send_message(chat_id=update.message.chat_id,
+                                 text="Param Error.")
                 return
             target_user = data["text"].split(" ")[1]
 
-            if models.Follows.select().where(
-                models.Follows.Telegram_id == int(target_user)
-            ).exists:
-                models.Follows.update(
+            try:
+                models.Follows.get(Telegram_id=int(target_user))
+            except models.DoesNotExist:
+                bot.send_message(chat_id=update.message.chat_id,
+                                 text="user not found..")
+                return
+
+            models.Follows.update(
                     IsAdmin=True,
                     PassWD=models.random_password()
                 ).where(
                     models.Follows.Telegram_id == int(target_user)
                 ).execute()
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success!")
-                return
-            else:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="User Not Found.")
-                return
-
+            bot.send_message(chat_id=update.message.chat_id, text="Success!")
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
             return
     elif command == "/change_pwd":
         try:
-            if models.Follows.select().where(
-                        models.Follows.Telegram_id == update.message.chat_id,
-                        models.Follows.IsAdmin is True):
+            try:
+                u = models.Follows.get(Telegram_id=update.message.chat_id)
+                if u.IsAdmin is False:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="You are not admin!")
+                    return
+            except models.DoesNotExist:
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not admin.")
+                                 text="You are not followed!")
                 return
 
             passwd = models.random_password()
@@ -194,11 +219,15 @@ def handle(data,update):
             return
     elif command == "/update":
         try:
-            if models.Follows.select().where(
-                        models.Follows.Telegram_id == update.message.chat_id,
-                        models.Follows.IsAdmin is True):
+            try:
+                u = models.Follows.get(Telegram_id=update.message.chat_id)
+                if u.IsAdmin is False:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="You are not admin!")
+                    return
+            except models.DoesNotExist:
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not admin.")
+                                 text="You are not followed!")
                 return
             import threading, rss
             t = threading.Thread(target=rss.main, args=(True,))
