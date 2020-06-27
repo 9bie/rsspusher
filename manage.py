@@ -26,7 +26,7 @@ def admin():
 def index(page=1):
     try:
         lists = []
-        items = DataBase.select().paginate(page, 50)
+        items = DataBase.select().order_by(DataBase.ID.desc()).paginate(page, 50)
         for i in items:
             print(i.ID,i.Form,i.Url,i.Summary)
             lists.append(

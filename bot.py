@@ -96,7 +96,7 @@ def handle(data,update):
             items = models.RssList.select()
             str_list = ""
             for i in items:
-                str_list += "ID: {}\n\tTitle:{}\n\tFeed:{}".format(i.ID,i.Title,i.Rss)
+                str_list += "ID: {}\n\tTitle:{}\n\tFeed:{}\n".format(i.ID,i.Title,i.Rss)
             bot.send_message(chat_id=update.message.chat_id,
                              text=str_list)
         except Exception as e:

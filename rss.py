@@ -9,6 +9,8 @@ def main(first_run=False):
     for item in items:
         try:
             report_s = ""
+            print("[RSS]Now:{}".format(item.Rss))
+
             data = feedparser.parse(item.Rss)
             for entries in data.entries:
 
@@ -19,10 +21,10 @@ def main(first_run=False):
                         Suummary=entries.summary,
                         Form=item.Title,
                     )
-                    report_s += '\t<a href="{}">{}</a>\n'.format(entries.link,entries.title)
+                    report_s += '\t<br><a href="{}">{}</a><br>\n'.format(entries.link,entries.title)
                     print(report_s)
                 except:
-                    pass
+                    print("[!RSS]{} in database.passing.".format(entries.title))
             if report_s != "":
                 report += "{} - {}:\n".format(data.feed.title,data.feed.subtitle)+report_s
 
@@ -33,4 +35,8 @@ def main(first_run=False):
 
 
 if __name__ == '__main__':
-    main(first_run=False)
+    import sys
+    if len(sys.argv) > 2:
+        main(first_run=True)
+    else:
+        main(first_run=False)
