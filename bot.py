@@ -153,7 +153,7 @@ def handle(data,update):
             ).exists:
                 models.Follows.update(
                     IsAdmin=True,
-                    Passwd=models.random_password()
+                    PassWD=models.random_password()
                 ).where(
                     models.Follows.Telegram_id == int(target_user)
                 ).execute()
@@ -181,7 +181,7 @@ def handle(data,update):
             passwd = models.random_password()
             models.Follows.update(
                     IsAdmin=True,
-                    Passwd=passwd
+                    PassWD=passwd
                 ).where(
                     models.Follows.Telegram_id == update.message.chat_id
                 ).execute()

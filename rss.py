@@ -12,11 +12,7 @@ def main(first_run=False):
             data = feedparser.parse(item.Rss)
             for entries in data.entries:
 
-                if models.DataBase.select().where(
-                        models.DataBase.Url == entries.link
-                ).exists:
-                    pass
-                else:
+                try:
                     models.DataBase.create(
                         Title=entries.title,
                         Url=entries.link,
@@ -25,10 +21,12 @@ def main(first_run=False):
                     )
                     report_s += '\t<a href="{}">{}</href>\n'.format(entries.link,entries.title)
                     print(report_s)
+                except:
+                    pass
             if report_s != "":
                 report += "{} - {}:\n".format(data.feed.title,data.feed.subtitle)+report_s
 
-            if first_run is False:
+            if first_run is False and report != "":
                 send_all_follows(report)
         except Exception as e:
             print("Some Error:{}".format(e))
