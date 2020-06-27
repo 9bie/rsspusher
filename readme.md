@@ -23,5 +23,5 @@
 
 ## todo
 
-    - <del>tg交互</del>已完成
-    - web交互
+    - tg交互 √
+    - web交互 x

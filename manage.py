@@ -49,3 +49,6 @@ def tg_event():
     handle(data, update)
     return "ok"
 
+
+if __name__ == '__main__':
+    app.run()

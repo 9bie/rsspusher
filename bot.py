@@ -8,15 +8,23 @@ def handle(data,update):
     command = data["text"].split(" ")[0]
     if command == "/join":
         try:
-            models.Follows.create(
-                Telegram_id=update.message.chat_id,
-                IsAdmin=False
-            )
-            bot.send_message(chat_id=update.message.chat_id,
+            if not models.Follows.select().where(
+                models.Follows.Telegram_id==update.message.chat_id,
+            ).exists:
+                models.Follows.create(
+                    Telegram_id=update.message.chat_id,
+                    IsAdmin=False
+                )
+                bot.send_message(chat_id=update.message.chat_id,
                              text="Success")
+            else:
+                bot.send_message(chat_id=update.message.chat_id,
+                                 text="You are followed.")
+            return
         except Exception as e:
             bot.send_message(chat_id=update.message.chat_id,
                              text="Have some error: {}".format(str(e)))
+            return
 
     elif command == "/leave":
         try:
@@ -105,7 +113,7 @@ def handle(data,update):
                               "Admin:\n"
                               "\t/add [title] [rss link] add the rss link\n"
                               "\t/delete [id] delete the rss target.id from /list\n"
-                              "\t/mysql get your web control's account.\n"
+                              "\t/myself get your web control's account.\n"
                               "\t/privilege [telegram_id] set ont follows to admin.\n"
                               "\t/change_pwd change you password!\n"
                               "\t/update update now and do not push to follows\n"
@@ -120,7 +128,7 @@ def handle(data,update):
                 u = models.Follows.get(Telegram_id=update.message.chat_id)
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="Your web control account:\n\tusername:{}\n\tpassword:{}".format(u.Telegram_id
-                                                                                                       , u.Passwd))
+                                                                                                       , u.PassWD))
             else:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text="You are not follows or not admin.")
@@ -193,7 +201,8 @@ def handle(data,update):
                                  text="You are not admin.")
                 return
             import threading, rss
-            threading.Thread(target=rss.main, args=(True,)).start()
+            t = threading.Thread(target=rss.main, args=(True,))
+            t.start()
 
             bot.send_message(chat_id=update.message.chat_id, text="Success!")
             return

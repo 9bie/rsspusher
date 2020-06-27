@@ -20,7 +20,7 @@ class Follows(BaseModel):
     ID = PrimaryKeyField()
     Telegram_id = IntegerField(null=False,unique=True)
     IsAdmin = BooleanField(null=False)
-    PassWD = CharField(null=False)
+    PassWD = CharField(null=True)
 
 
 class DataBase(BaseModel):
