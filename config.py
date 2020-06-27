@@ -1,5 +1,6 @@
 # coding:utf-8
 URL = ""
+TIMER = 5*60 # second
 # Bot
 TELEGRAM_KEYS = "850313928:AAHAfmlDrHzOvWw8G21oGSfAYh0xiwNyGpM"
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS

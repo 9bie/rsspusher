@@ -19,7 +19,7 @@ def main(first_run=False):
                         Suummary=entries.summary,
                         Form=item.Title,
                     )
-                    report_s += '\t<a href="{}">{}</href>\n'.format(entries.link,entries.title)
+                    report_s += '\t<a href="{}">{}</a>\n'.format(entries.link,entries.title)
                     print(report_s)
                 except:
                     pass

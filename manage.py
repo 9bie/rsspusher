@@ -1,13 +1,16 @@
 from flask import *
 #from flask_login import login_user, logout_user, login_required,current_user
 from models import DataBase
+from threading import Timer
 from bot import *
 app = Flask(__name__)
 
 
 @app.route("/start")
 def start():
+    import rss
     bot.setWebhook(webhook_url=WEBHOOKING)
+    Timer(TIMER, rss.main).start()
     return "Bot starting...",404
 
 
