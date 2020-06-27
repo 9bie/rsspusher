@@ -225,6 +225,6 @@ def send_all_follows(msg):
     try:
         follows = models.Follows.select()
         for f in follows:
-            bot.send_message(chat_id=f.Telegram_id,text=msg)
+            bot.send_message(chat_id=f.Telegram_id,text=msg,parse_mode="html")
     except Exception as e:
         print("Have some errors:{}".format(e))

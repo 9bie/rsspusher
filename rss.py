@@ -11,9 +11,12 @@ def main(first_run=False):
             report_s = ""
             data = feedparser.parse(item.Rss)
             for entries in data.entries:
-                if not models.DataBase.select().where(
+
+                if models.DataBase.select().where(
                         models.DataBase.Url == entries.link
                 ).exists:
+                    pass
+                else:
                     models.DataBase.create(
                         Title=entries.title,
                         Url=entries.link,
