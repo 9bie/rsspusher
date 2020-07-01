@@ -1,253 +1,173 @@
 from config import *
 import models
 import telegram
+import re
 bot = telegram.Bot(token=TELEGRAM_KEYS)
 
 
-def handle(data,update):
-    command = data["text"].split(" ")[0]
-    if command == "/join":
-        try:
-            try:
-                models.Follows.get(Telegram_id=update.message.chat_id)
-            except models.DoesNotExist:
-                models.Follows.create(
-                    Telegram_id=update.message.chat_id,
-                    IsAdmin=False
-                )
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success")
-                return
-            bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are followed.")
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
+class Bot:
 
-    elif command == "/leave":
-        try:
-            try:
-                models.Follows.get(Telegram_id=update.message.chat_id)
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not followed..")
-                return
-            models.Follows.get(Telegram_id=update.message.chat_id).delete_instance()
-            bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success")
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
+    def __init__(self,update):
+        self.update = update
+        self.chat_id = update.message.chat_id
+        self.data = update.message.to_dict()
+        self.command = self.data["text"].split[0]
+        self.param = self.data["text"].split
 
-    elif command == "/add":
+    def __grant(self, param_number):
+        if len(self.param) < param_number:
+            bot.send_message(chat_id=self.chat_id, text="Parameter error.")
+            return
+        if not models.Follows.select().where(
+                models.Follows.Telegram_id == self.chat_id
+        ).exists():
+            models.Follows.create(
+                Telegram_id=self.chat_id
+            )
+
+    def __is_channel_exists(self, id):
+        if not models.RssChannel.select().where(
+                models.RssChannel.Customize == id
+        ).exists():
+            bot.send_message(chat_id=self.chat_id, text="channel not found.")
+            return False
+        return True
+
+    def __create(self):
+
+        self.__grant(param_number=2)
+        if models.RssChannel.select().where(
+            Master=models.Follows.get(Telegram_id=self.chat_id)
+        ).count() >= 3:
+            bot.send_message(chat_id=self.chat_id,text="You have exceeded th"
+                                                       "e limit for creating channels, up to three")
+            return
+        models.RssChannel.create(
+            Customize=self.param[1],
+            Master=models.Follows.get(Telegram_id=self.chat_id)
+        )
+        bot.send_message(chat_id=self.chat_id,text="Success, your channel id is{},"
+                                                   " other users can join your"
+                                                       " rss channel by this id".format(self.param[1]))
+
+    def __join(self):
+        self.__grant(param_number=2)
+        id = self.param[1]
+        if not models.RssChannel.select().where(
+            models.RssChannel.Customize == id
+        ).exists():
+            bot.send_message(chat_id=self.chat_id,text="channel not found.")
+            return
+        models.RssMember.create(
+            Follows=models.Follows.get(Telegram_id=self.chat_id),
+            RssChannel=models.RssChannel.get(Customize=id)
+        )
+        bot.send_message(chat_id=self.chat_id,text="Successful.")
+
+    def __leave(self):
+        self.__grant(param_number=2)
+        id = self.param[1]
+        if not self.__is_channel_exists(id):
+            return
+        if not models.RssMember.select().where(
+            Follows=models.Follows.get(Telegram_id=self.chat_id),
+            RssChhannel=models.RssChannel.get(Customize=id)
+        ).exists():
+            bot.send_message(chat_id=self.chat_id,text="you are not join this channel.")
+            return
+        models.RssMember.delete().where(
+            Follows=models.Follows.get(Telegram_id=self.chat_id),
+            RssChhannel=models.RssChannel.get(Customize=id)
+        ).execute()
+        bot.send_message(chat_id=self.chat_id,text="Successful!")
+
+    def __list(self):
+        self.__grant(param_number=2)
+        id = self.param[1]
+        if not self.__is_channel_exists(id):
+            return
+        results = ""
+        rsslists = models.RssList.select().where(
+            Form=models.RssChannel().get(Customize=id)
+        )
+        for i in rsslists:
+            results += "Rss id: {}\n\tTitle:{}\n\tRss:{}\n\t".format(i.Form.Customize,i.Title,i.Rss)
+        if results == "":
+            bot.send_message(chat_id=self.chat_id,text="you are not join any channel.")
+        else:
+            bot.send_message(chat_id=self.chat_id,text=results)
+
+    def __myself(self):
+        pass
+
+    def __add(self):
+        self.__grant(param_number=3)
+        id = self.param[1]
+        title = self.param[2]
+        link = self.param[3]
+        if not self.__is_channel_exists(id):
+            return
+        pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+        if len(re.findall(pattern,link))==0:
+            bot.send_message(chat_id=self.chat_id,text="please input the true http link.")
+            return
+        else:
+            models.RssList.create(
+                Title=title,
+                Rss=link,
+                Form=models.RssChannel.get(Customize=id)
+            )
+            bot.send_message(chat_id=self.chat_id,text="Successful!")
+
+    def __delete(self):
+        self.__grant(param_number=2)
+
+
+    def __privilege(self):
+        pass
+
+    def __change_pwd(self):
+        pass
+
+    def __update(self):
+        pass
+
+    def handle(self):
         try:
-            if len(data["text"].split(" ")) != 3:
-                bot.send_message(chat_id=update.message.chat_id,
-                         text="Param Error.")
+            if self.command == "/help":
+                bot.send_message(chat_id=self.chat_id,
+                                 text="[] is is param,<> is return"
+                                      "User:\n"
+                                      "\t/create <id> create rss subscription source,and return the subscription id"
+                                      "\t/join [id] join the source and recv the rss push\n"
+                                      "\t/leave [id] cancel recv the rss push.\n"
+                                      "\t/list [id] <rss_id_list> view the subscription source sub list\n"
+                                      "\t/myself <joined list,web account>get yourself\n"
+                                      "\t/help you see now\n"
+                                      "Admin:\n"
+                                      "\t/add [id] [title] [rss link] add the rss link\n"
+                                      "\t/delete [rss_id] delete the rss target.id from /list\n"
+                                      "\t/privilege [id] [telegram_id] set ont follows to admin.(you must channel master)\n"
+                                      "\t/change_pwd [new pwd]change you password!\n"
+                                      "\t/update update now and do not push to follows\n"
+                                 )
                 return
+
+            elif self.command == "/about":
+                bot.send_message(chat_id=self.chat_id,
+                                 text="Made By 9bie's gongdi english and jiushi."
+                                      "\nWeb:{}\nGithub: https://github.com/9bie/rsspusher".format(URL))
+                return
+            elif self.command == "/create":
+                self.__create()
             else:
-                try:
-                    u = models.Follows.get(Telegram_id=update.message.chat_id)
-                    if u.IsAdmin is False:
-                        bot.send_message(chat_id=update.message.chat_id,
-                                         text="You are not admin!")
-                        return
-                except models.DoesNotExist:
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text="You are not followed!")
-                    return
-                title = data["text"].split(" ")[1]
-                url = data["text"].split(" ")[2]
-                models.RssList.create(
-                        Title=title,
-                        Rss=url
-                )
-                bot.send_message(chat_id=update.message.chat_id,
-                                     text="Success!.")
+                bot.send_message(chat_id=self.chat_id,
+                                 text="I don't know what you say,you can send /help for me.")
                 return
         except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-    elif command == "/delete":
-        try:
-            try:
-                u = models.Follows.get(Telegram_id=update.message.chat_id)
-                if u.IsAdmin is False:
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text="You are not admin!")
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not followed!")
-                return
-
-            if len(data["text"].split(" ")) != 2 :
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="Param Error or you are not admin.")
-                return
-
-            try :
-                models.RssList.get(int(data["text"].split(" ")[1]))
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="rss not found..")
-                return
-            models.RssList.get(ID=int(data["text"].split(" ")[1])).delete_instance()
-            bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success!.")
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
-    elif command == "/list":
-        try:
-            items = models.RssList.select()
-            str_list = ""
-            for i in items:
-                str_list += "ID: {}\n\tTitle:{}\n\tFeed:{}\n".format(i.ID,i.Title,i.Rss)
-            bot.send_message(chat_id=update.message.chat_id,
-                             text=str_list)
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
-    elif command == "/help":
-        bot.send_message(chat_id=update.message.chat_id,
-                         text="User:\n"
-                              "\t/join recv the rss push\n"
-                              "\t/leave cancel recv the rss push.\n"
-                              "\t/list printf the rss list\n"
-                              "\t/help you see now\n"
-                              "Admin:\n"
-                              "\t/add [title] [rss link] add the rss link\n"
-                              "\t/delete [id] delete the rss target.id from /list\n"
-                              "\t/myself get your web control's account.\n"
-                              "\t/privilege [telegram_id] set ont follows to admin.\n"
-                              "\t/change_pwd change you password!\n"
-                              "\t/update update now and do not push to follows\n"
-                         )
-        return
-    elif command == "/myself":
-        try:
-            try:
-                u = models.Follows.get(Telegram_id=update.message.chat_id)
-                if u.IsAdmin is False:
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text="You are not admin!")
-                    return
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not followed!")
-                return
-
-            u = models.Follows.get(Telegram_id=update.message.chat_id)
-            bot.send_message(chat_id=update.message.chat_id,
-                                 text="Your web control account:\n\tusername:{}\n\tpassword:{}".format(u.Telegram_id
-                                                                                              , u.PassWD))
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
-    elif command == "/privilege":
-        try:
-            try:
-                u = models.Follows.get(Telegram_id=update.message.chat_id)
-                if u.IsAdmin is False:
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text="You are not admin!")
-                    return
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not followed!")
-                return
-            if len(data["text"].split(" ")) != 2 :
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="Param Error.")
-                return
-            target_user = data["text"].split(" ")[1]
-
-            try:
-                models.Follows.get(Telegram_id=int(target_user))
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="user not found..")
-                return
-
-            models.Follows.update(
-                    IsAdmin=True,
-                    PassWD=models.random_password()
-                ).where(
-                    models.Follows.Telegram_id == int(target_user)
-                ).execute()
-            bot.send_message(chat_id=update.message.chat_id, text="Success!")
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
-    elif command == "/change_pwd":
-        try:
-            try:
-                u = models.Follows.get(Telegram_id=update.message.chat_id)
-                if u.IsAdmin is False:
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text="You are not admin!")
-                    return
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not followed!")
-                return
-
-            passwd = models.random_password()
-            models.Follows.update(
-                    IsAdmin=True,
-                    PassWD=passwd
-                ).where(
-                    models.Follows.Telegram_id == update.message.chat_id
-                ).execute()
-            bot.send_message(chat_id=update.message.chat_id,
-                                 text="Success! Your new password is {}".format(passwd))
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
-    elif command == "/update":
-        try:
-            try:
-                u = models.Follows.get(Telegram_id=update.message.chat_id)
-                if u.IsAdmin is False:
-                    bot.send_message(chat_id=update.message.chat_id,
-                                     text="You are not admin!")
-                    return
-            except models.DoesNotExist:
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="You are not followed!")
-                return
-            import threading, rss
-            t = threading.Thread(target=rss.main, args=(True,))
-            t.start()
-
-            bot.send_message(chat_id=update.message.chat_id, text="Success!")
-            return
-        except Exception as e:
-            bot.send_message(chat_id=update.message.chat_id,
-                             text="Have some error: {}".format(str(e)))
-            return
-    elif command == "/about":
-        bot.send_message(chat_id=update.message.chat_id,
-                         text="Made By 9bie's gongdi english and jiushi."
-                              "\nWeb:{}\nGithub: https://github.com/9bie/rsspusher".format(URL))
-        return
-    else:
-        bot.send_message(chat_id=update.message.chat_id,
-                         text="I don't know what you say,you can send /help for me.")
-        return
+            if DEBUG:
+                e = "*" * 20
+            bot.send_message(chat_id=self.chat_id, text="RssPusher Exception:\n\t{}".format(e))
 
 
 def send_all_follows(msg):

@@ -28,7 +28,6 @@ def index(page=1):
         lists = []
         items = DataBase.select().order_by(DataBase.ID.desc()).paginate(page, 50)
         for i in items:
-            print(i.ID,i.Form,i.Url,i.Summary)
             lists.append(
                 {
                     "Form":i.Form,
@@ -49,7 +48,7 @@ def tg_event():
     if update.message is None:
         return "Show me your TOKEN please!"
     data = update.message.to_dict()
-    handle(data, update)
+    Bot(update).handle()
     return "ok"
 
 

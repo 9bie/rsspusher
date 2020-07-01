@@ -1,6 +1,13 @@
 # coding:utf-8
 URL = ""
 TIMER = 5*60 # second
+DEBUG = True
+if DEBUG:
+    import logging
+    logger = logging.getLogger('peewee')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+
 # Bot
 TELEGRAM_KEYS = "850313928:AAHAfmlDrHzOvWw8G21oGSfAYh0xiwNyGpM"
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
