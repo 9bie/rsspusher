@@ -1,5 +1,5 @@
 # coding:utf-8
-URL = ""
+
 TIMER = 5*60 # second
 DEBUG = True
 if DEBUG:
@@ -9,8 +9,14 @@ if DEBUG:
     logger.addHandler(logging.StreamHandler())
 
 # Bot
-TELEGRAM_KEYS = "850313928:AAHAfmlDrHzOvWw8G21oGSfAYh0xiwNyGpM"
+TELEGRAM_KEYS = ""
+IS_WEBHOOK = False
+URL = ""
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
+
+
+
+
 YOUR_CHAT_ID_FOR_ADMIN = 103359874
 
 

@@ -14,8 +14,8 @@ class Bot:
         self.update = update
         self.chat_id = update.message.chat_id
         self.data = update.message.to_dict()
-        self.command = self.data["text"].split[0]
-        self.param = self.data["text"].split
+        self.command = self.data["text"].split()[0]
+        self.param = self.data["text"].split()
 
     def __grant(self, param_number):
         if len(self.param) < param_number:
@@ -40,7 +40,7 @@ class Bot:
 
         self.__grant(param_number=2)
         if models.RssChannel.select().where(
-                Master=models.Follows.get(Telegram_id=self.chat_id)
+                models.RssChannel.Master == models.Follows.get(Telegram_id=self.chat_id)
         ).count() >= 3:
             bot.send_message(chat_id=self.chat_id, text="You have exceeded th"
                                                         "e limit for creating channels, up to three")
@@ -54,7 +54,7 @@ class Bot:
             RssChannel=new_channel
         )
 
-        bot.send_message(chat_id=self.chat_id, text="Success, your channel id is{},"
+        bot.send_message(chat_id=self.chat_id, text="Success, your channel id is {},"
                                                     " other users can join your"
                                                     " rss channel by this id".format(self.param[1]))
 
@@ -78,8 +78,8 @@ class Bot:
         if not self.__is_channel_exists(id):
             return
         if not models.RssMember.select().where(
-                Follows=models.Follows.get(Telegram_id=self.chat_id),
-                RssChhannel=models.RssChannel.get(Customize=id)
+                models.RssMember.Follows == models.Follows.get(Telegram_id=self.chat_id),
+                models.RssMember.RssChhannel == models.RssChannel.get(Customize=id)
         ).exists():
             bot.send_message(chat_id=self.chat_id, text="you are not join this channel.")
             return
@@ -96,7 +96,7 @@ class Bot:
             return
         results = ""
         rsslists = models.RssList.select().where(
-            Form=models.RssChannel().get(Customize=id)
+            models.RssList.Form == models.RssChannel().get(Customize=id)
         )
         for i in rsslists:
             results += "Rss id: {}\n\tTitle:{}\n\tRss:{}\n\t".format(i.Form.Customize, i.Title, i.Rss)
@@ -106,7 +106,27 @@ class Bot:
             bot.send_message(chat_id=self.chat_id, text=results)
 
     def __myself(self):
-        pass
+        self.__grant(param_number=1)
+        master = "\nYou are master for:"
+        rss_master = models.RssChannel.select().where(
+            models.RssChannel.Master == models.Follows.get(Telegram_id=self.chat_id)
+        )
+
+        for i in rss_master:
+            master += "\n\tRss Channel ID: {}\n".format(i.RssChannel.Customize)
+        rss_admin = models.RssAdmin.select().where(
+            models.RssAdmin.Follows == models.Follows.get(Telegram_id=self.chat_id)
+        )
+        admin = "\nYou are Admin for:"
+        for j in rss_admin:
+            admin += "\n\tRss Channel ID: {}\n".format(j.RssChannel.Customize)
+        rss_member = models.RssMember.select().where(
+            models.RssMember.Follows == models.Follows.get(Telegram_id=self.chat_id)
+        )
+        member = "\nYou are joined:"
+        for k in rss_master:
+            member += "\n\tRss Channel ID: {}\n".format(k.RssChannel.Customize)
+        bot.send_message(chat_id=self.chat_id, text=rss_master + rss_admin + rss_member)
 
     def __add(self):
         self.__grant(param_number=3)
@@ -133,7 +153,7 @@ class Bot:
         if not self.__is_channel_exists(id):
             return
         rss_id = self.param[2]
-        if not models.RssList.select().where(ID=rss_id).exists():
+        if not models.RssList.select().where(models.RssList.ID == rss_id).exists():
             bot.send_message(chat_id=self.chat_id, text="target rss link not found.")
             return
         models.RssList.delete().where(
@@ -152,7 +172,7 @@ class Bot:
             bot.send_message(chat_id=self.chat_id, text="sorry, you are not master for this channel.")
             return
         if not models.Follows.select().where(
-                Telegram_id=telegram_id
+                models.Follows.Telegram_id == telegram_id
         ).exists():
             bot.send_message(chat_id=self.chat_id, text="sorry,target telegram user not follow bot")
             return
@@ -196,17 +216,36 @@ class Bot:
                 return
             elif self.command == "/create":
                 self.__create()
+            elif self.command == "/join":
+                self.__join()
+            elif self.command == "/add":
+                self.__add()
+            elif self.command == "/delete":
+                self.__delete()
+            elif self.command == "/leave":
+                self.__leave()
+            elif self.command == "/list":
+                self.__list()
+            elif self.command == "/myself":
+                self.__myself()
+            elif self.command == "/privilege":
+                self.__privilege()
+            elif self.command == "/change_pwd":
+                self.__change_pwd()
+            elif self.command == "/update":
+                self.__update()
+
             else:
                 bot.send_message(chat_id=self.chat_id,
                                  text="I don't know what you say,you can send /help for me.")
                 return
         except Exception as e:
-            if DEBUG:
+            if DEBUG is False:
                 e = "*" * 20
             bot.send_message(chat_id=self.chat_id, text="RssPusher Exception:\n\t{}".format(e))
 
 
-def send_all_follows(rss_channel,msg):
+def send_all_follows(rss_channel, msg):
     try:
         follows = models.RssMember.select().where(
             models.RssMember.RssChannel == models.RssChannel.get(ID=rss_channel)
