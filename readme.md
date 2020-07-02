@@ -3,7 +3,7 @@
 
 请使用python3运行，当然理论上python2也是可以的
 
-## how to use
+## how to build
 修改 `config.py` 
 
 填写好`TELEGRAM_KEYS`，为你的bot keys

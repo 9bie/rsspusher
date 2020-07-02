@@ -1,8 +1,14 @@
-from config import *
+import json
+import random
+import string
+
 from peewee import *
-import random,string
+
+from config import *
+
 db = SqliteDatabase(DB_PATH) if not ISMYSQL else MySQLDatabase(host=MYSQL_HOST, database=MYSQL_DATABASE,
-                                                                user=MYSQL_USERNAME, password=MYSQL_PASSWORD, port=MYSQL_PORT)
+                                                               user=MYSQL_USERNAME, password=MYSQL_PASSWORD,
+                                                               port=MYSQL_PORT)
 
 
 class BaseModel(Model):
@@ -18,8 +24,8 @@ class Follows(BaseModel):
 
 class RssChannel(BaseModel):
     ID = PrimaryKeyField()
-    Customize = CharField(null=False,unique=True)
-    Master = ForeignKeyField(Follows ,related_name="master")
+    Customize = CharField(null=False, unique=True)
+    Master = ForeignKeyField(Follows, related_name="master")
 
 
 class RssList(BaseModel):
@@ -36,25 +42,25 @@ class RssMember(BaseModel):
 
 class RssAdmin(BaseModel):
     Follows = ForeignKeyField(Follows, related_name="follows")
-    RssChannel = ForeignKeyField(RssChannel,related_name="rss_channel")
-
+    RssChannel = ForeignKeyField(RssChannel, related_name="rss_channel")
 
 
 class DataBase(BaseModel):
     ID = PrimaryKeyField()
     Form = CharField(null=False)
     Title = CharField(null=False)
-    Url = CharField(null=False,unique=True)
+    Url = CharField(null=False, unique=True)
     Summary = TextField(null=True)
 
 
 def create_table():
     db.connect()
-    db.create_tables([Follows,RssChannel,RssList,RssMember,RssAdmin,DataBase])
+    db.create_tables([Follows, RssChannel, RssList, RssMember, RssAdmin, DataBase])
 
 
 def random_password():
     return ''.join(random.sample(string.ascii_letters + string.digits, 8))
+
 
 ## 字符串转字典
 def str_to_dict(dict_str):
@@ -93,8 +99,8 @@ def query_to_list(query, exclude=None):
         list.append(dict)
     return list
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     create_table()
 
     a = Follows.create(
@@ -111,6 +117,5 @@ if __name__ == '__main__':
         Follows=a,
         RssChannel=c
     )
-    res = Follows.select().where(Follows.Telegram_id==2).count()
+    res = Follows.select().where(Follows.Telegram_id == 2).count()
     print(res)
-
