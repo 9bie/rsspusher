@@ -30,9 +30,14 @@ class RssChannel(BaseModel):
 
 class RssList(BaseModel):
     ID = PrimaryKeyField()
-    Title = CharField(null=False)
+    # Title = CharField(null=False)
     Rss = CharField(null=False, unique=True)
-    Form = ForeignKeyField(RssChannel, related_name="form")
+
+
+class RssListFriendShip(BaseModel):
+    RssList = ForeignKeyField(RssList, related_name="rss_list")
+    RssChannel = ForeignKeyField(RssChannel, related_name="rss_channel")
+    CustomizeTitle = CharField(null=False)
 
 
 class RssMember(BaseModel):
@@ -47,15 +52,15 @@ class RssAdmin(BaseModel):
 
 class DataBase(BaseModel):
     ID = PrimaryKeyField()
-    Form = CharField(null=False)
     Title = CharField(null=False)
     Url = CharField(null=False, unique=True)
     Summary = TextField(null=True)
+    Form = ForeignKeyField(RssList, related_name="rss_list")
 
 
 def create_table():
     db.connect()
-    db.create_tables([Follows, RssChannel, RssList, RssMember, RssAdmin, DataBase])
+    db.create_tables([Follows, RssChannel, RssList, RssListFriendShip, RssMember, RssAdmin, DataBase])
 
 
 def random_password():
@@ -102,20 +107,3 @@ def query_to_list(query, exclude=None):
 
 if __name__ == '__main__':
     create_table()
-
-    a = Follows.create(
-        Telegram_id=1,
-    )
-    b = Follows.create(
-        Telegram_id=2,
-    )
-    c = RssChannel.create(
-        Customize='aaa" and 1=2',
-        Master=a
-    )
-    RssAdmin.create(
-        Follows=a,
-        RssChannel=c
-    )
-    res = Follows.select().where(Follows.Telegram_id == 2).count()
-    print(res)

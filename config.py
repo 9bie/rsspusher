@@ -15,16 +15,12 @@ URL = ""
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
 
 
-
-
-YOUR_CHAT_ID_FOR_ADMIN = 103359874
-
-
 # DataBase
 ISMYSQL = False
+DB_PATH = "rss.db"
 MYSQL_HOST = "localhost"
 MYSQL_DATABASE = "rss"
 MYSQL_USERNAME = "root"
 MYSQL_PASSWORD = "root"
 MYSQL_PORT = 3306
-DB_PATH = "rss.db"
+
