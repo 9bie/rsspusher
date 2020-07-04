@@ -157,19 +157,19 @@ class Bot:
         id = self.param[1]
         if not self.__is_channel_exists(id):
             return
-        results = ""
+        results = "<b>Channel ID </b>:{}".format(i.RssChannel.Customize)
         rsslists = models.RssListFriendShip.select().where(
             models.RssListFriendShip.RssChannel == models.RssChannel().get(Customize=id)
         )
         for i in rsslists:
-            results += "*Rss Form*: {}\n\t - Rss id: {}\n\t - Title:{}\n\t - Rss:{}\n\t".format(i.RssChannel.Customize,
+            results += "Rss id: {}\n\t - Title:{}\n\t - Rss:{}\n\t".format(
                                                                                                 i.RssList.ID,
                                                                                                 i.CustomizeTitle,
                                                                                                 i.RssList.Rss)
         if results == "":
             bot.send_message(chat_id=self.chat_id, text="没有任何东西在频道里.")
         else:
-            bot.send_message(chat_id=self.chat_id, text=results, parse_mode="markdown")
+            bot.send_message(chat_id=self.chat_id, text=results, parse_mode="html")
 
     def __myself(self):
         if not self.__grant(param_number=1):
