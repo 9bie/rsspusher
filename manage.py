@@ -13,6 +13,13 @@ app = Flask(__name__)
 Timer(TIMER, rss.main).start()
 
 
+@app.route('/start')
+def index():
+    if IS_WEBHOOK:
+        bot.setWebhook(WEBHOOKING)
+    return "ok"
+
+
 @app.route('/')
 @app.route("/<id>")
 def index(id=""):
@@ -49,7 +56,6 @@ def index(id=""):
 
 @app.route("/" + TELEGRAM_KEYS, methods=["POST"])
 def tg_event():
-
     update = telegram.Update.de_json(request.get_json(force=True), bot)
 
     if update.message is None:

@@ -60,5 +60,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    if IS_WEBHOOK:
-        bot.setWebhook(WEBHOOKING)
+

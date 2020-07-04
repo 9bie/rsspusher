@@ -167,7 +167,7 @@ class Bot:
                                                                                                 i.CustomizeTitle,
                                                                                                 i.RssList.Rss)
         if results == "":
-            bot.send_message(chat_id=self.chat_id, text="该频道已经添加了.")
+            bot.send_message(chat_id=self.chat_id, text="没有任何东西在频道里.")
         else:
             bot.send_message(chat_id=self.chat_id, text=results, parse_mode="markdown")
 
