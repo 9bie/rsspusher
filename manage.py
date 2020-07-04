@@ -20,6 +20,7 @@ def start():
     return "ok"
 
 
+
 @app.route("/" + TELEGRAM_KEYS, methods=["POST"])
 def tg_event():
     update = telegram.Update.de_json(request.get_json(force=True), bot)
