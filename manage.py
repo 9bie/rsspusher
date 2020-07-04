@@ -20,6 +20,16 @@ def start():
     return "ok"
 
 
+@app.route("/" + TELEGRAM_KEYS, methods=["POST"])
+def tg_event():
+    update = telegram.Update.de_json(request.get_json(force=True), bot)
+
+    if update.message is None:
+        return "Show me your TOKEN please!"
+    Bot(update).handle()
+    return "ok"
+
+
 @app.route('/')
 @app.route("/<id>")
 def index(id=""):
@@ -52,16 +62,6 @@ def index(id=""):
             return render_template('subindex.html', items=lists)
     except Exception as e:
         return "Have some error:{}\nPlease link @bakabie".format(e), 500
-
-
-@app.route("/" + TELEGRAM_KEYS, methods=["POST"])
-def tg_event():
-    update = telegram.Update.de_json(request.get_json(force=True), bot)
-
-    if update.message is None:
-        return "Show me your TOKEN please!"
-    Bot(update).handle()
-    return "ok"
 
 
 def update():
