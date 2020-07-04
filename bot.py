@@ -90,8 +90,8 @@ class Bot:
             RssChannel=new_channel
         )
 
-        bot.send_message(chat_id=self.chat_id, text="成功, 你创建的频道id为:\n\t *{}*\n"
-                                                    " 其他用户可以根据这个id加入你的频道接受推送.\n*你的主页为*:\n\t - {}".format(self.param[1],URL+"/"+self.param[1]),)
+        bot.send_message(chat_id=self.chat_id, text="成功, 你创建的频道id为:\n\t - {}\n"
+                                                    " 其他用户可以根据这个id加入你的频道接受推送.\n你的主页为:\n\t - {}".format(self.param[1],URL+"/"+self.param[1]),)
 
     def __join(self):
         if not self.__grant(param_number=2):
