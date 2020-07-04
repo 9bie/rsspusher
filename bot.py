@@ -157,7 +157,7 @@ class Bot:
         id = self.param[1]
         if not self.__is_channel_exists(id):
             return
-        results = "<b>Channel ID </b>:{}".format(i.RssChannel.Customize)
+        results = ""
         rsslists = models.RssListFriendShip.select().where(
             models.RssListFriendShip.RssChannel == models.RssChannel().get(Customize=id)
         )
@@ -269,7 +269,7 @@ class Bot:
         bot.send_message(chat_id=self.chat_id, text="成功!")
 
     def __privilege(self):
-        if not self.__grant(param_number=2):
+        if not self.__grant(param_number=3):
             return
         id = self.param[1]
         telegram_id = self.param[2]
