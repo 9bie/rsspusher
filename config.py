@@ -1,6 +1,6 @@
 # coding:utf-8
 
-TIMER = 5*60 # second
+TIMER = 10*60 # second
 DEBUG = True
 if DEBUG:
     import logging

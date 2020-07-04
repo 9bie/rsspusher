@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RssPusher</title>
+</head>
+<body>
+<div >
+    <div class="page-header" style="text-align: center">
+        <h2 class="text-center">Rss Pusher</h2>
+    </div>
+
+    <div id="control" style="text-align: center">
+{#        <button id="btn_refresh" type="button" class="btn btn-success">Admin</button>#}
+    </div>
+
+
+    <br>
+        <table id="server_list" border="1" width="80%" style="margin-left: 10%;margin-right: 10%;text-align: center">
+            <tr id="title">
+                <td></td>
+                <td>Form</td>
+                <td>Title</td>
+                <td>Summary</td>
+            </tr>
+            {% for item in items %}
+            <tr id="{{ item.ID }}">
+                <td><label>
+                        <input type="checkbox" name="category" value="s1"/>
+                    </label></td>
+                <td>{{ item.Form }}</td>
+                <td><a href="{{ item.Url }}" target="_blank">{{ item.Title }}</a></td>
+                <td>{{ item.Summary }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div style="text-align: center;margin-top: 50px">
+        <p>
+            Author: <a href="https://t.me/bakabie">@bakabie</a>
+            <br>
+            Github: <a href="https://github.com/9bie/rsspusher">Rss Pusher</a>
+        </p>
+    </div>
+</body>
+</html>

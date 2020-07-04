@@ -3,56 +3,54 @@ from threading import Timer, Thread
 from time import sleep
 
 from flask import *
-
+import rss
 from bot import *
 # from flask_login import login_user, logout_user, login_required,current_user
 from models import DataBase
 
 app = Flask(__name__)
 
-
-@app.route("/start")
-def start():
-    import rss
-
-    Timer(TIMER, rss.main).start()
-    return "Bot starting...", 404
-
-
-@app.route("/admin")
-def admin():
-    user = request.form['user']
-    passwd = request.form['passwd']
-    pass  # gugugugu
+Timer(TIMER, rss.main).start()
 
 
 @app.route('/')
-@app.route("/<int:page>")
-def index(page=1):
+@app.route("/<id>")
+def index(id=""):
+    page = request.args.get('page', '')
+    if not page:
+        page = 0
+    else:
+        page = int(page)
     try:
-        lists = []
-        items = DataBase.select().order_by(DataBase.ID.desc()).paginate(page, 50)
-        for i in items:
-            lists.append(
-                {
-                    "Form": i.Form,
-                    "Title": i.Title,
-                    "Url": i.Url,
-                    "Summary": i.Summary if i.Summary is not None else ""
-                }
-            )
-
-        return render_template('index.html', items=lists)
+        if id == "":
+            return render_template('index.html')
+        else:
+            lists = []
+            if not models.RssChannel.select().where(
+                    models.RssChannel.Customize == id
+            ).exists():
+                return "channel not found", 404
+            items = DataBase.select().where(
+                DataBase.Form == models.RssChannel.get(Customize=id)
+            ).paginate(page, 50)
+            for i in items:
+                lists.append(
+                    {
+                        "Form": models.RssListFriendShip.get(RssList=i.Form).CustomizeTitle,
+                        "Title": i.Title,
+                        "Url": i.Url,
+                        "Summary": i.Summary if i.Summary is not None else ""
+                    }
+                )
+            return render_template('subindex.html', items=lists)
     except Exception as e:
         return "Have some error:{}\nPlease link @bakabie".format(e), 500
 
 
 @app.route("/" + TELEGRAM_KEYS, methods=["POST"])
 def tg_event():
-
     bot.setWebhook(WEBHOOKING)
     update = telegram.Update.de_json(request.get_json(force=True), bot)
-
 
     if update.message is None:
         return "Show me your TOKEN please!"
@@ -61,8 +59,7 @@ def tg_event():
 
 
 def update():
-
-    update_id=0
+    update_id = 0
     while True:
         bot.deleteWebhook()
         if update_id == 0:
@@ -70,16 +67,14 @@ def update():
         else:
             updates = telegram.Bot(TELEGRAM_KEYS).get_updates(offset=update_id)
         for update in updates:
-            update_id=update.update_id+1
+            update_id = update.update_id + 1
             print(update)
             Bot(update).handle()
         sleep(3)
 
+
 if not IS_WEBHOOK:
     Thread(target=update).start()
-
-
-
 
 if __name__ == '__main__':
     app.run()
