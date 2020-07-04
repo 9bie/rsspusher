@@ -49,7 +49,7 @@ def index(id=""):
 
 @app.route("/" + TELEGRAM_KEYS, methods=["POST"])
 def tg_event():
-    bot.setWebhook(WEBHOOKING)
+
     update = telegram.Update.de_json(request.get_json(force=True), bot)
 
     if update.message is None:
@@ -75,6 +75,8 @@ def update():
 
 if not IS_WEBHOOK:
     Thread(target=update).start()
+else:
+    bot.setWebhook(WEBHOOKING)
 
 if __name__ == '__main__':
     app.run()
