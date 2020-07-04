@@ -75,8 +75,6 @@ def update():
 
 if not IS_WEBHOOK:
     Thread(target=update).start()
-else:
-    bot.setWebhook(WEBHOOKING)
 
 if __name__ == '__main__':
     app.run()

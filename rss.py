@@ -1,7 +1,8 @@
 import feedparser
 import re
 import models
-from bot import send_all_follows
+from config import *
+from bot import send_all_follows,bot
 
 
 def delete_html(html):
@@ -59,3 +60,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    if IS_WEBHOOK:
+        bot.setWebhook(WEBHOOKING)

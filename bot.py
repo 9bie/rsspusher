@@ -65,6 +65,13 @@ class Bot:
         ).count() >= 3:
             bot.send_message(chat_id=self.chat_id, text="你已经超出最大频道限制（数量为3条，请联系管理员 @bakabie）")
             return
+        is_match = re.match("^[_a-zA-Z0-9]+$",self.param[1])
+        if not is_match:
+            bot.send_message(chat_id=self.chat_id,text="仅限字母数字下划线且不超过8位")
+            return
+        if len(self.param[1])> 8:
+            bot.send_message("仅限字母数字下划线且不超过8位")
+            return
         if models.RssChannel.select().where(
                 models.RssChannel.Customize == self.param[1]
         ).exists():
