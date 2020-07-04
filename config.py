@@ -1,6 +1,7 @@
 # coding:utf-8
 
 TIMER = 10*60 # second
+TIMEOUT = 30
 DEBUG = True
 if DEBUG:
     import logging
@@ -9,7 +10,7 @@ if DEBUG:
     logger.addHandler(logging.StreamHandler())
 
 # Bot
-TELEGRAM_KEYS = "1334452358:AAEmQICXklw0rymRRNaQWu-nwASCIbArjrc"
+TELEGRAM_KEYS = ""
 IS_WEBHOOK = False
 URL = ""
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS

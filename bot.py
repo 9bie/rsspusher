@@ -5,7 +5,7 @@ import telegram
 
 import models
 from config import *
-
+from time import sleep
 # from rss import check
 bot = telegram.Bot(token=TELEGRAM_KEYS)
 
@@ -385,16 +385,18 @@ class Bot:
                              parse_mode="markdown")
 
 
-def send_all_follows(rss_channel, msg):
+def send_all_follows(rsslist, msg):
     try:
-        channels = models.RssListFriendShip.select().where(
-            models.RssListFriendShip.RssList == rss_channel
+
+        rssfriendship = models.RssListFriendShip.select().where(
+            models.RssListFriendShip.RssList == rsslist
         )
-        for c in channels:
+        for c in rssfriendship:
             follows = models.RssMember.select().where(
-                models.RssMember.RssChannel == c
+                models.RssMember.RssChannel == c.RssChannel
             )
             for f in follows:
+
                 bot.send_message(chat_id=f.Follows.Telegram_id, text=msg, parse_mode="html")
     except Exception as e:
         print("Have some errors:{}".format(e))

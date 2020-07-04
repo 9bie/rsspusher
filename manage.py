@@ -14,7 +14,7 @@ Timer(TIMER, rss.main).start()
 
 
 @app.route('/start')
-def index():
+def start():
     if IS_WEBHOOK:
         bot.setWebhook(WEBHOOKING)
     return "ok"
