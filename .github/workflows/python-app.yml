@@ -19,7 +19,7 @@ jobs:
         python-version: 3.7.6
     - name: Install dependencies          # 安装依赖
       run: |
-        cd robot
+        cd rsspusher
         pip install -r requirements.txt
     - name: send rss                      
       env:
