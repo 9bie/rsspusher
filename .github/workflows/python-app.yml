@@ -19,13 +19,11 @@ jobs:
         python-version: 3.7.6
     - name: Install dependencies          # 安装依赖
       run: |
-        cd rsspusher
         pip install -r requirements.txt
     - name: send rss                      
       env:
         TELEGRAM_KEYS: ${{ secrets.TELEGRAM_KEYS }}
       run: |
-        cd rsspusher
         python rss.py
     - name: Commit
       run: |
