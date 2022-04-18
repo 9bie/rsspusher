@@ -11,7 +11,7 @@ enum34==1.1.6
 feedparser==6.0.0
 Flask==1.1.2
 funcsigs==1.0.2
-futures==3.3.0
+futures==3.1.0
 ipaddress==1.0.17
 itsdangerous==1.1.0
 Jinja2==2.11.2
