@@ -1,5 +1,5 @@
 # coding:utf-8
-
+import os
 TIMER = 10*60 # second
 TIMEOUT = 30
 DEBUG = True
@@ -10,9 +10,9 @@ if DEBUG:
     logger.addHandler(logging.StreamHandler())
 
 # Bot
-TELEGRAM_KEYS = ""
+TELEGRAM_KEYS = os.getenv("telegram_keys")
 IS_WEBHOOK = False
-URL = ""
+URL = "https://i.9bie.org"
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
 
 
