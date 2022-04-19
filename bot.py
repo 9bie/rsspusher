@@ -7,7 +7,6 @@ import models
 from config import *
 from time import sleep
 # from rss import check
-raise TELEGRAM_KEYS
 bot = telegram.Bot(token=TELEGRAM_KEYS)
 
 
