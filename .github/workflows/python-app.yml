@@ -34,6 +34,7 @@ jobs:
         git config --global user.name 9bie
         git add .
         git commit -m "update the rssdb" -a
+      continue-on-error: true
     - name: Push changes
       uses: ad-m/github-push-action@master 
       with:
