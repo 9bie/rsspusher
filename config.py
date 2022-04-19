@@ -11,7 +11,6 @@ if DEBUG:
 
 # Bot
 TELEGRAM_KEYS = os.environ["TELEGRAM_KEYS"]
-printf(TELEGRAM_KEYS)
 IS_WEBHOOK = False
 URL = "https://i.9bie.org"
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
