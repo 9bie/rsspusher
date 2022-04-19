@@ -6,9 +6,11 @@ name: RssPusher
 on:               
   schedule:                           
     - cron: '0/10 * * * *'
+  push:
+    branches:
+    - main
 jobs:
   build:
-
     runs-on: ubuntu-latest
     steps:
     - name: 'Checkout codes'
