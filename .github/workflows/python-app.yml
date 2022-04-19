@@ -4,9 +4,11 @@ name: RssPusher
 on:               
   schedule:                           
     - cron: '0/10 * * * *'
+  push:
+    branches:
+      - master
 jobs:
   build:
-
     runs-on: ubuntu-latest
     steps:
     - name: 'Checkout codes'
@@ -23,7 +25,7 @@ jobs:
         pip install -r requirements.txt
     - name: send rss                      
       env:
-        TELEGRAM_KEYS: ${{ secrets.TELEGRAM_KEYS }}
+        TELEGRAM_KEYS: ${{ secrets.TELEGRAM_TOKEN }}
       run: |
         python rss.py
     - name: Commit
@@ -36,4 +38,5 @@ jobs:
       uses: ad-m/github-push-action@master 
       with:
         branch: master
-        github_token: ${{ secrets.TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        
