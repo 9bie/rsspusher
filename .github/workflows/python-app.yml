@@ -38,4 +38,4 @@ jobs:
       uses: ad-m/github-push-action@master 
       with:
         branch: main
-        github_token: ${{ secrets.TOKEN }}
+        github_token: ${{ env.TOKEN }}
