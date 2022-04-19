@@ -25,7 +25,7 @@ jobs:
         pip install -r requirements.txt
     - name: send rss                      
       env:
-        TELEGRAM_KEYS: ${{ secrets.TELEGRAM_KEYS }}
+        TELEGRAM_KEYS: ${{ env.TELEGRAM_KEYS }}
       run: |
         python rss.py
     - name: Commit
