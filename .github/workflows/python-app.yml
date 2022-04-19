@@ -8,7 +8,7 @@ on:
     - cron: '0/10 * * * *'
   push:
     branches:
-    - main
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
