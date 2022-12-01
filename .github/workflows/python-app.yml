@@ -13,10 +13,10 @@ jobs:
     steps:
     - name: 'Checkout codes'
       uses: actions/checkout@v2           # 拉取最新的代码
-    - name: Set up Python 3.7.6
+    - name: Set up Python 3.8.15
       uses: actions/setup-python@v2       # 设置 python 版本
       with:
-        python-version: 3.7.6
+        python-version: 3.8.15
     - name: Install xmllint
       run: sudo apt install libgirepository1.0-dev
     - name: Install dependencies          # 安装依赖
