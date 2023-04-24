@@ -2,5 +2,4 @@
 feedparser==6.0.0
 Flask==1.1.2
 peewee==3.14.0
-PyGObject==3.30.4
 python-telegram-bot==13.1
