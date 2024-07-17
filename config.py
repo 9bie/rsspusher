@@ -10,7 +10,7 @@ if DEBUG:
     logger.addHandler(logging.StreamHandler())
 
 # Bot
-TELEGRAM_KEYS = os.environ["TELEGRAM_KEYS"]
+TELEGRAM_KEYS = "1386497203:AAGYMq8Hmj7YTfgbIs74PgDrJMT8LpN3zVY"
 IS_WEBHOOK = False
 URL = "https://i.9bie.org"
 WEBHOOKING = URL + "/"+TELEGRAM_KEYS
